@@ -3,6 +3,7 @@ import httpx
 import json
 from typing import Dict
 import logging
+from utils.fact_checker import fact_check_text
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -36,15 +37,7 @@ Respond in the following JSON format:
 """
 
 async def analyze_text(text: str) -> Dict:
-    """
-    Analyzes the given text for authenticity, fraud detection, and AI generation likelihood.
-    
-    Parameters:
-        text (str): Input text to analyze
-    
-    Returns:
-        Dict: A structured dictionary with classification and reasoning
-    """
+   
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY environment variable not set")
     
@@ -52,6 +45,10 @@ async def analyze_text(text: str) -> Dict:
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
+    
+    
+    fact_check_result = fact_check_text(text)
+
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -61,10 +58,10 @@ async def analyze_text(text: str) -> Dict:
     payload = {
         "model": GROQ_MODEL,
         "messages": messages,
-        "response_format": {"type": "json_object"}  # Add explicit JSON format requirement
+        "response_format": {"type": "json_object"}  
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as client:  # Set timeout to avoid hanging
+    async with httpx.AsyncClient(timeout=30.0) as client:  
         try:
             logger.info(f"Sending request to Groq API for text: '{text[:50]}...'")
             response = await client.post(GROQ_API_URL, headers=headers, json=payload)
@@ -119,7 +116,8 @@ async def analyze_text(text: str) -> Dict:
                         structured[key] = False
                     else:
                         structured[key] = "Unknown"
-
+                        
+            structured["Extras"] = fact_check_result
             return structured
 
         except httpx.RequestError as e:

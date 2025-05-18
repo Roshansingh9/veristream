@@ -13,3 +13,6 @@ bs4
 youtube_transcript_api
 langid
 python-multipart
+wikipedia
+sentence_transformers
+numpy

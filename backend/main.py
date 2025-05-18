@@ -6,6 +6,7 @@ from utils.url_summary import summarize_content
 from utils.analyze_content import analyze_text
 from fastapi.middleware.cors import CORSMiddleware
 
+
 app = FastAPI()
 
 app.add_middleware(
@@ -47,6 +48,10 @@ async def summarize_url(url: str):
 async def analyze(text: str):
     result= await analyze_text(text)
     return result
+
+
+
+
     
     
 if __name__ == "__main__":
