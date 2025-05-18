@@ -4,20 +4,24 @@ from utils.url_checker import check_url
 from utils.transcribe_audio import transcribe
 from utils.url_summary import summarize_content
 from utils.analyze_content import analyze_text
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
     
     
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "root"}
 
-@app.get("/translate")
-async def translate(text):
-    return translate_language(text)
+
 
 @app.get("/check_url")
 async def check(url):
@@ -25,16 +29,26 @@ async def check(url):
 
 @app.post("/transcribe/")
 async def transcribe_audio(file: UploadFile = File(...)):
-    return await transcribe(file)
-
+    transcription = await transcribe(file)
+    # Now we know transcription["transcript"] is a string
+    translated_text = translate_language(transcription["transcript"])
+    result = await analyze_text(translated_text.translated)
+    
+    return {**transcription, "translated": translated_text.translated, "language": translated_text.language, **result}
 
 
 @app.post("/url_summary")
 async def summarize_url(url: str):
-    return summarize_content(url)
+    summary = summarize_content(url)
+    result=await analyze_text(summary["summary"])
+    return {**summary, **result}
 
 @app.post("/analyze_text")
 async def analyze(text: str):
     result= await analyze_text(text)
     return result
     
+    
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=10000, reload=True)    

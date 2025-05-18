@@ -20,4 +20,4 @@ async def transcribe(file: UploadFile):
         model="distil-whisper-large-v3-en",
         response_format="verbose_json",
     )
-    return {"text": transcription.text}
+    return {"transcript": transcription.text}
