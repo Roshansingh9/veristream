@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+deep-translator
+pydantic
+langdetect
+pycountry
+validators
+requests
+dotenv
+langchain_groq 
+wikipedia-api
+bs4
+youtube_transcript_api
