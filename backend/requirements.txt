@@ -11,3 +11,4 @@ langchain_groq
 wikipedia-api
 bs4
 youtube_transcript_api
+langid
