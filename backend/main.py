@@ -28,7 +28,7 @@ async def root():
 async def check(url):
     return check_url(url)
 
-@app.post("/transcribe/")
+@app.post("/analyze_audio")
 async def transcribe_audio(file: UploadFile = File(...)):
     transcription = await transcribe(file)
     # Now we know transcription["transcript"] is a string
