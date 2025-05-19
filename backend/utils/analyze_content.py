@@ -97,7 +97,7 @@ async def analyze_text(text: str) -> Dict:
                     "fraudulent": False,
                     "fraud_reason": "Failed to analyze due to technical issues",
                     "ai_generated": False,
-                    "ai_reason": "Failed to analyze due to technical issues"
+                    "ai_reason": "Failed to analyze due to technical issues",
                     "summary":"Failed to analyze due to technical issues"
                 }
 
