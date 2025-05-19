@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TextAnalyzer from "./components/TextAnalyzer";
 import AudioTranscription from "./components/AudioTranscription";
 import UrlSummarizer from "./components/UrlSummarizer";
 import Header from "./components/Header";
+import { motion, AnimatePresence } from "framer-motion";
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState(
-    "https://veristream.onrender.com/"
-  ); // Default to URL tab
+  const tabs = [
+    { id: "text", icon: "🧠", label: "Text Analyzer" },
+    { id: "audio", icon: "🎧", label: "Audio Transcription" },
+    { id: "url", icon: "🌐", label: "URL Summarizer" },
+  ];
 
-  const renderContent = () => {
-    switch (activeTab) {
+  const [activeTabId, setActiveTabId] = useState("url");
+
+  const [tabComponents, setTabComponents] = useState({
+    text: null,
+    audio: null,
+    url: null,
+  });
+
+  useEffect(() => {
+    if (!tabComponents[activeTabId]) {
+      setTabComponents((prev) => ({
+        ...prev,
+        [activeTabId]: getComponentForTab(activeTabId),
+      }));
+    }
+  }, [activeTabId, tabComponents]);
+
+  const getComponentForTab = (tabId) => {
+    switch (tabId) {
       case "text":
         return <TextAnalyzer />;
       case "audio":
@@ -18,7 +38,7 @@ const App = () => {
       case "url":
         return <UrlSummarizer />;
       default:
-        return <TextAnalyzer />;
+        return null;
     }
   };
 
@@ -27,52 +47,60 @@ const App = () => {
       <Header />
 
       <main className="container mx-auto px-4 py-4">
-        <div className="bg-[#0d1117] border border-[#30363d] rounded-md">
+        <div className="bg-[#0d1117] border border-[#30363d] rounded-md overflow-hidden">
           {/* Tab Navigation */}
-          <div className="bg-[#161b22] rounded-t-md">
-            <div className="flex">
-              <button
-                className={`px-6 py-3 text-sm rounded-t-md ${
-                  activeTab === "text"
-                    ? "text-white relative"
-                    : "text-[#8b949e]"
-                }`}
-                onClick={() => setActiveTab("text")}
-              >
-                🧠 Text Analyzer
-                {activeTab === "text" && (
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-15 h-0.5 bg-[#2563eb] rounded"></div>
-                )}
-              </button>
-              <button
-                className={`px-6 py-3 text-sm rounded-t-md ${
-                  activeTab === "audio"
-                    ? "text-white relative"
-                    : "text-[#8b949e]"
-                }`}
-                onClick={() => setActiveTab("audio")}
-              >
-                🎧 Audio Transcription
-                {activeTab === "audio" && (
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-15 h-0.5 bg-[#2563eb] rounded"></div>
-                )}
-              </button>
-              <button
-                className={`px-6 py-3 text-sm rounded-t-md ${
-                  activeTab === "url" ? "text-white relative" : "text-[#8b949e]"
-                }`}
-                onClick={() => setActiveTab("url")}
-              >
-                🌐 URL Summarizer
-                {activeTab === "url" && (
-                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-15 h-0.5 bg-[#2563eb] rounded"></div>
-                )}
-              </button>
-            </div>
-          </div>
+          <nav className="bg-[#161b22] rounded-t-md">
+            <ul className="flex">
+              {tabs.map((tab) => (
+                <motion.li
+                  key={tab.id}
+                  initial={false}
+                  animate={{
+                    backgroundColor:
+                      activeTabId === tab.id
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "transparent",
+                  }}
+                  className="relative flex-1 cursor-pointer"
+                  onClick={() => setActiveTabId(tab.id)}
+                >
+                  <div className="px-6 py-3 text-sm flex items-center justify-center gap-2">
+                    <span>{tab.icon}</span>
+                    <span
+                      className={
+                        activeTabId === tab.id ? "text-white" : "text-[#8b949e]"
+                      }
+                    >
+                      {tab.label}
+                    </span>
+                  </div>
+                  {activeTabId === tab.id && (
+                    <motion.div
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563eb] rounded"
+                      layoutId="underline"
+                    />
+                  )}
+                </motion.li>
+              ))}
+            </ul>
+          </nav>
 
           {/* Content Area */}
-          <div className="p-6">{renderContent()}</div>
+          <div className="p-6">
+            <div className="min-h-[300px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTabId}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {tabComponents[activeTabId]}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </main>
     </div>

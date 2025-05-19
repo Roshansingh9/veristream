@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import SummaryResult from "./SummaryResult";
+import AnalysisCard from "./AnalysisCard";
 
 const TextAnalyzer = () => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
+  const [showResult, setShowResult] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,18 +23,14 @@ const TextAnalyzer = () => {
       setError(null);
 
       // The API expects text as a query parameter, not in the request body
-      // Based on your curl example: https://veristream.onrender.com/analyze_text?text=...
       const encodedText = encodeURIComponent(text);
       const url = `https://veristream.onrender.com/analyze_text?text=${encodedText}`;
-
-      console.log("Sending request to:", url); // For debugging
 
       const response = await fetch(url, {
         method: "POST",
         headers: {
           accept: "application/json",
         },
-        // No body needed as we're using query parameters
       });
 
       if (!response.ok) {
@@ -42,8 +42,24 @@ const TextAnalyzer = () => {
       }
 
       const data = await response.json();
-      console.log("API Response:", data);
-      setResults(data);
+
+      // Prepare the data for SummaryResult component
+      const formattedResults = {
+        ...data,
+        type: "text",
+        title: "Text Analysis Results",
+        summary: data.ai_reason || "No detailed analysis available",
+        Extras: {
+          confidence: data.confidence || 0,
+          source: text.substring(0, 100) + (text.length > 100 ? "..." : ""),
+          alert: data.fraudulent
+            ? "This content appears to be fraudulent"
+            : "No Data",
+        },
+      };
+
+      setResults(formattedResults);
+      setShowResult(true);
     } catch (err) {
       console.error("Analysis error:", err);
       setError(err.message || "An error occurred while analyzing the text");
@@ -53,144 +69,76 @@ const TextAnalyzer = () => {
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-2 font-space-grotesk">
-        Text Analyzer
-      </h2>
-      <p className="text-[#8b949e] mb-6">
-        Analyze text content to detect AI generation and potential fraud
-      </p>
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-[#161b22] rounded-t-lg p-8">
+        <p className="text-blue-300 text-xl mb-8">
+          Analyze text content to detect AI generation and potential fraud
+        </p>
 
-      <div className="bg-[#161b22] border border-[#30363d] rounded-md p-5 mb-6">
-        <form onSubmit={handleSubmit}>
-          <h3 className="text-base font-semibold mb-3 font-space-grotesk">
-            Enter text to analyze
-          </h3>
-          <textarea
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-md p-4 h-40 focus:outline-none focus:border-[#2563eb] text-sm"
-            placeholder="Paste or type your text here..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          ></textarea>
+        <form onSubmit={handleSubmit} className="relative">
+          <div className="relative">
+            <textarea
+              className="w-full bg-gray-900 border border-gray-700 rounded-lg p-4 h-40 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Paste or type your text here..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+            ></textarea>
+          </div>
 
-          {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
+          {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
 
-          <div className="flex justify-end mt-4">
-            <button
+          <div className="mt-4 flex justify-end">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="submit"
-              className="bg-[#2563eb] text-white rounded-md px-6 py-2 hover:bg-blue-600 transition duration-200"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 flex items-center"
               disabled={loading}
             >
-              Analyze
-            </button>
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Processing
+                </>
+              ) : (
+                <>Analyze</>
+              )}
+            </motion.button>
           </div>
         </form>
       </div>
 
       {loading && (
-        <div className="relative w-full h-1 bg-[#30363d] rounded mt-4 mb-8">
-          <div className="absolute top-0 left-1/4 right-1/4 h-1 bg-[#2563eb] rounded animate-pulse"></div>
+        <div className="bg-gray-900 p-12 flex flex-col items-center justify-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-blue-400 font-medium">
+            Analyzing content and verifying authenticity...
+          </p>
         </div>
       )}
 
-      {results && (
-        <div className="bg-[#161b22] border border-[#30363d] rounded-md p-5">
-          <h3 className="text-lg font-semibold mb-4 font-space-grotesk">
-            Analysis Results
-          </h3>
-
-          <div className="space-y-4">
-            {/* Authenticity */}
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-space-grotesk font-semibold">
-                  Authenticity
-                </span>
-                <span
-                  className={`px-4 py-1 rounded-full text-sm ${
-                    results.authenticity === "Valid"
-                      ? "bg-green-900 bg-opacity-20 text-green-500"
-                      : "bg-red-900 bg-opacity-20 text-red-500"
-                  }`}
-                >
-                  {results.authenticity || "Unknown"}
-                </span>
-              </div>
-              <p className="text-[#8b949e] text-sm">
-                {results.authenticity_reason || "No details available"}
-              </p>
-            </div>
-
-            {/* Fraudulent */}
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-space-grotesk font-semibold">
-                  Fraudulent
-                </span>
-                <span
-                  className={`px-4 py-1 rounded-full text-sm ${
-                    results.fraudulent
-                      ? "bg-red-900 bg-opacity-20 text-red-500"
-                      : "bg-green-900 bg-opacity-20 text-green-500"
-                  }`}
-                >
-                  {results.fraudulent ? "True" : "False"}
-                </span>
-              </div>
-              <p className="text-[#8b949e] text-sm">
-                {results.fraud_reason || "No details available"}
-              </p>
-            </div>
-
-            {/* AI Detection */}
-            <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="font-space-grotesk font-semibold">
-                  AI Generated
-                </span>
-                <span
-                  className={`px-4 py-1 rounded-full text-sm ${
-                    results.ai_generated
-                      ? "bg-green-900 bg-opacity-20 text-green-500"
-                      : "bg-red-900 bg-opacity-20 text-red-500"
-                  }`}
-                >
-                  {results.ai_generated ? "True" : "False"}
-                </span>
-              </div>
-              <p className="text-[#8b949e] text-sm">
-                {results.ai_reason || "No details available"}
-              </p>
-            </div>
-
-            {/* Extras - Only show if confidence > 0 */}
-            {results.Extras && results.Extras.confidence > 0 && (
-              <div className="bg-[#0d1117] border border-[#30363d] rounded-md p-4">
-                <span className="font-space-grotesk font-semibold block mb-2">
-                  Additional Information
-                </span>
-                <div className="space-y-2">
-                  {results.Extras.alert &&
-                    results.Extras.alert !== "No Data" && (
-                      <div className="flex justify-between">
-                        <span className="text-[#8b949e]">Alert:</span>
-                        <span className="text-yellow-500">
-                          {results.Extras.alert}
-                        </span>
-                      </div>
-                    )}
-                  {results.Extras.source && (
-                    <div className="flex justify-between">
-                      <span className="text-[#8b949e]">Source:</span>
-                      <span className="text-[#8b949e]">
-                        {results.Extras.source}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+      {showResult && !loading && results && (
+        <div className="p-6 bg-gray-900 rounded-b-lg border-t border-gray-800">
+          <SummaryResult results={results} />
         </div>
       )}
     </div>
