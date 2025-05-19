@@ -4,6 +4,7 @@ import AudioTranscription from "./components/AudioTranscription";
 import UrlSummarizer from "./components/UrlSummarizer";
 import Header from "./components/Header";
 import { motion, AnimatePresence } from "framer-motion";
+import Footer from "./components/Footer";
 
 const App = () => {
   const tabs = [
@@ -103,6 +104,7 @@ const App = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

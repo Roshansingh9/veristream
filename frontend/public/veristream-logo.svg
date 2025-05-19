@@ -1,0 +1,7 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Blue background shield -->
+  <rect width="120" height="120" rx="16" fill="#2563EB"/>
+  
+  <!-- Shield icon in white -->
+  <path d="M45 60L55 70L75 50M89.09 39.92C80.62 38.15 72.51 34.71 65.25 29.78C58 24.86 51.71 18.52 46.72 11.1C29.09 26.2 15 45.5 15 60C15 87.96 34.12 112.45 60 118.11C85.88 112.45 105 87.96 105 60C105 54.79 103.67 49.02 101.09 42.92" stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
