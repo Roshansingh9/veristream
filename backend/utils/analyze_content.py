@@ -23,6 +23,7 @@ You will be provided with a piece of text. Your job is to:
 2. Determine if the text contains FRAUDULENT or SCAM-like content
 3. Estimate the likelihood of the text being AI-GENERATED
 4. For each determination, explain your reasoning clearly
+5. At last summarize the entire given text in a few sentences
 
 Respond in the following JSON format:
 
@@ -32,7 +33,8 @@ Respond in the following JSON format:
   "fraudulent": true or false,
   "fraud_reason": "Your explanation here",
   "ai_generated": true or false,
-  "ai_reason": "Your explanation here"
+  "ai_reason": "Your explanation here",
+  "summary": "Your summary here"
 }
 """
 
@@ -96,6 +98,7 @@ async def analyze_text(text: str) -> Dict:
                     "fraud_reason": "Failed to analyze due to technical issues",
                     "ai_generated": False,
                     "ai_reason": "Failed to analyze due to technical issues"
+                    "summary":"Failed to analyze due to technical issues"
                 }
 
             # Validate required keys

@@ -143,7 +143,7 @@ const Footer = () => {
                     whileHover={{ scale: 1.02 }}
                   >
                     <a
-                      href="mailto:contact@veristream.io"
+                      href="mailto:roshan.kr.singh9857@gmail.com"
                       className="flex items-center space-x-2"
                     >
                       <span>Feedback or queries?</span>

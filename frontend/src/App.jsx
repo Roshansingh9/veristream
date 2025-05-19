@@ -8,8 +8,8 @@ import Footer from "./components/Footer";
 
 const App = () => {
   const tabs = [
-    { id: "text", icon: "🧠", label: "Text Analyzer" },
-    { id: "audio", icon: "🎧", label: "Audio Transcription" },
+    { id: "text", icon: "📝", label: "Text Analyzer" },
+    { id: "audio", icon: "🎧", label: "Audio/Video Transcription" },
     { id: "url", icon: "🌐", label: "URL Summarizer" },
   ];
 

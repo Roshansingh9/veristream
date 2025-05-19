@@ -8,7 +8,6 @@ const UrlSummarizer = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  // Animation variants - only for interactive elements, not initial appearance
   const itemVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -17,30 +16,7 @@ const UrlSummarizer = () => {
     },
   };
 
-  // Example result for demonstration purposes
-  const exampleResult = {
-    type: "webpage",
-    title:
-      "DSA Tutorial – Learn Data Structures and Algorithms | GeeksforGeeks",
-    summary:
-      "Here is a comprehensive summary of the webpage article:\n\nThe article focuses on the importance of Data Structures and Algorithms (DSA) in efficient problem-solving, particularly in software applications and company interviews. To learn DSA, it is recommended to have a strong foundation in programming language basics, build logical thinking, and understand time and space complexities. The article emphasizes the significance of daily, weekly, and monthly coding problem-solving using resources like GfG.\n\nThe article covers various data structures, including:\n\n* Stacks, Queues, Deques, Trees, Heaps, and Graphs, which are crucial for efficient problem-solving and widely used in software applications.\n* Algorithms such as Dynamic Programming, Greedy Algorithms, Bitwise Algorithms, Backtracking Algorithm, Divide and Conquer, Branch and Bound, Geometric Algorithms, and Randomized Algorithms, which provide efficient solutions for various problems.\n\nThe article also highlights the importance of advanced data structures, such as Trie, Segment Tree, Red-Black Tree, and Binary Indexed Tree, in handling large datasets and real-time processing. These data structures enable efficient solutions for tasks like fast prefix searches, range queries, and dynamic updates, leading to better scalability and faster execution.\n\nIn conclusion, the article emphasizes the significance of DSA in software applications and company interviews, and provides an overview of various data structures and algorithms that can be used to solve problems efficiently.",
-    authenticity: "Valid",
-    authenticity_reason:
-      "The text is well-structured, coherent, and provides meaningful information about Data Structures and Algorithms. It covers a clear topic, and the language used is technical but understandable, indicating a genuine and informative article.",
-    fraudulent: false,
-    fraud_reason:
-      "There is no evidence of scam-like content, misleading information, or attempts to deceive the reader. The text appears to be an informative summary of an article, with no apparent ulterior motives.",
-    ai_generated: true,
-    ai_reason:
-      "The text exhibits characteristics of AI-generated content, such as overly formal language, a lack of personal tone, and an exhaustive enumeration of technical terms. The sentence structure and word choice appear to be systematic and algorithmic, suggesting the use of natural language generation techniques.",
-    Extras: {
-      alert: "No Data",
-      confidence: 0,
-      source: null,
-    },
-  };
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!url) {
       setError("Please enter a valid URL");
       return;
@@ -48,19 +24,38 @@ const UrlSummarizer = () => {
 
     setLoading(true);
     setError(null);
+    setResult(null);
 
-    // Format URL if needed
     let formattedUrl = url;
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       formattedUrl = `https://${url}`;
     }
 
-    // In a real app, you would make an API call here
-    // For demonstration, we'll use setTimeout to simulate an API call
-    setTimeout(() => {
-      setResult(exampleResult);
+    try {
+      const response = await fetch(
+        `https://veristream.onrender.com/url_summary?url=${encodeURIComponent(
+          formattedUrl
+        )}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch summary");
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      console.error("API error:", err);
+      setError("Something went wrong while analyzing the URL.");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -201,4 +196,3 @@ const UrlSummarizer = () => {
 };
 
 export default UrlSummarizer;
-
