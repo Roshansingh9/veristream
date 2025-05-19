@@ -120,7 +120,7 @@ const Footer = () => {
 
                   {/* How We Built It */}
                   <motion.a
-                    href="https://medium.com/@roshan.singh/building-veristream-my-journey-into-content-verification-e7d2f45a3b6c"
+                    href="https://medium.com/@roshan.kr.singh9857/inside-veristream-how-we-built-a-real-time-ai-powered-content-intelligence-system-92a3034acdeb"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center space-x-2 text-gray-400 hover:text-blue-400 transition-colors duration-200"
@@ -172,7 +172,7 @@ const Footer = () => {
           <p className="mt-2">
             <span className="inline-block px-1">
               <a
-                href="#privacy"
+        
                 className="hover:text-blue-400 transition-colors duration-200"
               >
                 Privacy Policy
@@ -181,7 +181,7 @@ const Footer = () => {
             <span className="inline-block px-1">•</span>
             <span className="inline-block px-1">
               <a
-                href="#terms"
+                
                 className="hover:text-blue-400 transition-colors duration-200"
               >
                 Terms of Service

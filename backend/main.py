@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=["https://vercel.com/roshan-kr-singhs-projects/veristream/GW6n4df8BHM2YZPjMtDrmY5n79qa"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
